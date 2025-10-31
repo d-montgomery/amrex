@@ -304,6 +304,12 @@ else
   USE_EB := FALSE
 endif
 
+ifdef USE_NODAL_HACK
+  USE_NODAL_HACK := $(strip $(USE_NODAL_HACK))
+else
+  USE_NODAL_HACK := FALSE
+endif
+
 ifdef USE_SENSEI_INSITU
   USE_SENSEI_INSITU := $(strip $(USE_SENSEI_INSITU))
   ifdef NO_SENSEI_AMR_INST
@@ -954,6 +960,10 @@ endif
 
 ifeq ($(USE_EB),TRUE)
     DEFINES += -DAMREX_USE_EB
+endif
+
+ifeq ($(USE_NODAL_HACK),TRUE)
+    DEFINES += -DAMREX_USE_NODAL_HACK
 endif
 
 ifeq ($(AMREX_XSDK),TRUE)
