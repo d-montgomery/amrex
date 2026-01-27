@@ -171,11 +171,7 @@ void AlgVector<T,Allocator>::copyAsync (AlgVector<T> const& rhs)
     AMREX_ASSERT(m_data.size() == rhs.m_data.size());
     T* dst = m_data.data();
     T const* src = rhs.data();
-#ifdef AMREX_USE_GPU
     Gpu::dtod_memcpy_async(dst, src, n*sizeof(T));
-#else
-    std::memcpy(dst, src, n*sizeof(T));
-#endif
 }
 
 template <typename T, typename Allocator>
@@ -310,7 +306,7 @@ void AlgVector<T,Allocator>::printToFile (std::string const& file) const
     Gpu::streamSynchronize();
     T const* p = hv.data();
 #else
-    T const* p = m_data;
+    T const* p = m_data.data();
 #endif
     for (Long i = 0, N = m_data.size(); i < N; ++i) {
         ofs << i+m_begin << " " << p[i] << "\n";

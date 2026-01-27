@@ -68,6 +68,9 @@ struct Info
     //! batch size.
     bool twod_mode = false;
 
+    //! We might have a special twod_mode: nx or ny == 1 && nz > 1.
+    bool oned_mode = false;
+
     //! Batched FFT size. Only support in R2C, not R2X.
     int batch_size = 1;
 
@@ -77,6 +80,7 @@ struct Info
     Info& setDomainStrategy (DomainStrategy s) { domain_strategy = s; return *this; }
     Info& setPencilThreshold (int t) { pencil_threshold = t; return *this; }
     Info& setTwoDMode (bool x) { twod_mode = x; return *this; }
+    Info& setOneDMode (bool x) { oned_mode = x; return *this; }
     Info& setBatchSize (int bsize) { batch_size = bsize; return *this; }
     Info& setNumProcs (int n) { nprocs = n; return *this; }
 };
@@ -402,7 +406,7 @@ struct Plan
         strides[0] = 0;
         strides[ndims] = 1;
         for (int i = ndims-1; i >= 1; --i) {
-            strides[i] = strides[i+1] * len[ndims-1-i];
+            strides[i] = strides[i+1] * len[i];
         }
 #ifndef AMREX_USE_MKL_DFTI_2024
         pp->set_value(oneapi::mkl::dft::config_param::FWD_STRIDES, strides);

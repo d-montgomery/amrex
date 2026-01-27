@@ -936,19 +936,11 @@ buildNeighborList (CheckPair const& check_pair, int type_ind, int* ref_ratio,
                 auto dxInv = lgeom.InvCellSizeArray();
                 auto ploa  = lgeom.ProbLoArray();
 
-#ifdef AMREX_USE_GPU
                 Gpu::htod_memcpy_async( dxi_v.data()   + type, dxInv.data(), sizeof(dxInv) );
                 Gpu::htod_memcpy_async( plo_v.data()   + type, ploa.data() , sizeof(ploa) );
                 Gpu::htod_memcpy_async( lo_v.data()    + type, &lo         , sizeof(lo)    );
                 Gpu::htod_memcpy_async( hi_v.data()    + type, &hi         , sizeof(hi)    );
                 Gpu::htod_memcpy_async( nbins_v.data() + type, &nbins      , sizeof(nbins) );
-#else
-                std::memcpy( dxi_v.data()   + type, dxInv.data(), sizeof(dxInv) );
-                std::memcpy( plo_v.data()   + type, ploa.data() , sizeof(ploa)  );
-                std::memcpy( lo_v.data()    + type, &lo         , sizeof(lo)    );
-                std::memcpy( hi_v.data()    + type, &hi         , sizeof(hi)    );
-                std::memcpy( nbins_v.data() + type, &nbins      , sizeof(nbins) );
-#endif
             }
 
             Gpu::exclusive_scan(nbins_v.begin(), nbins_v.end(), off_bins_v.begin());
@@ -1062,9 +1054,9 @@ selectActualNeighbors (CheckPair const& check_pair, int num_cells)
                 int nz = hi.z-lo.z+1;
 
                 bool isActualNeighbor = false;
-                for (int ii = amrex::max(ix-num_cells, 0); ii <= amrex::min(ix+num_cells, nx); ++ii) {
-                    for (int jj = amrex::max(iy-num_cells, 0); jj <= amrex::min(iy+num_cells, ny); ++jj) {
-                        for (int kk = amrex::max(iz-num_cells, 0); kk <= amrex::min(iz+num_cells, nz); ++kk) {
+                for (int ii = amrex::max(ix-num_cells, 0); ii <= amrex::min(ix+num_cells, nx-1); ++ii) {
+                    for (int jj = amrex::max(iy-num_cells, 0); jj <= amrex::min(iy+num_cells, ny-1); ++jj) {
+                        for (int kk = amrex::max(iz-num_cells, 0); kk <= amrex::min(iz+num_cells, nz-1); ++kk) {
                             if (isActualNeighbor) { break; }
                             int nbr_cell_id = (ii * ny + jj) * nz + kk;
                             for (auto p = poffset[nbr_cell_id]; p < poffset[nbr_cell_id+1]; ++p) {
