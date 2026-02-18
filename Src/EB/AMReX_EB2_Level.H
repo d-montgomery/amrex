@@ -11,7 +11,9 @@
 #include <AMReX_Array.H>
 #include <AMReX_EBCellFlag.H>
 #include <AMReX_MultiCutFab.H>
-#include <AMReX_MarchingCubes.H>
+#if (AMREX_SPACEDIM == 3)
+#  include <AMReX_MarchingCubes.H>
+#endif
 #include <AMReX_EB2_MultiGFab.H>
 #include <AMReX_EB2_C.H>
 #include <AMReX_EB2_IF_AllRegular.H>
@@ -91,7 +93,9 @@ protected:
     BoxArray m_covered_grids;
     DistributionMapping m_dmap;
     MultiFab m_sdf;
+#if (AMREX_SPACEDIM == 3)
     std::map<int,std::unique_ptr<MC::MCFab>> m_marching_cubes;
+#endif
     MultiGFab m_mgf;
     MultiFab m_levelset;
     FabArray<EBCellFlagFab> m_cellflag;
@@ -167,7 +171,7 @@ GShopLevel<G>::GShopLevel (IndexSpace const* is, G const& gshop, const Geometry&
                            int max_grid_size, int ngrow, bool extend_domain_face, int num_crse_opt)
     : Level(is, geom)
 {
-    if (std::is_same<typename G::FunctionType, AllRegularIF>::value) {
+    if (std::is_same_v<typename G::FunctionType, AllRegularIF>) {
         m_allregular = true;
         m_ok = true;
         return;
