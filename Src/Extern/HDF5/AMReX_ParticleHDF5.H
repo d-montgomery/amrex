@@ -1321,7 +1321,12 @@ ParticleContainer_impl<ParticleType, NArrayReal, NArrayInt, Allocator, CellAssig
 
             const int rank = ParallelDescriptor::MyProc();
             const int NReaders = MaxReaders();
-            if (rank >= NReaders) { return; }
+            if (rank >= NReaders) {
+                H5Dclose(int_dset);
+                H5Dclose(real_dset);
+                H5Gclose(grp);
+                continue;
+            }
 
             const int Navg = ngrids[lev] / NReaders;
             const int Nleft = ngrids[lev] - Navg * NReaders;
@@ -1362,6 +1367,8 @@ ParticleContainer_impl<ParticleType, NArrayReal, NArrayInt, Allocator, CellAssig
         H5Gclose(grp);
     } // end for level
 
+    H5Tclose(comp_dtype);
+    H5Pclose(fapl);
     H5Fclose(fid);
 
     Redistribute();

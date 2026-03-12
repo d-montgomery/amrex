@@ -37,6 +37,12 @@ int main(int argc, char* argv[])
         pp.query("name", name, 1);
         AMREX_ALWAYS_ASSERT(name == "line 2");
 
+        std::vector<std::string> sa;
+        std::vector<std::string> sb;
+        pp.getarr("sa", sa);
+        pp.getarr("sa", sb);
+        AMREX_ALWAYS_ASSERT(sa == sb && (sa == std::vector<std::string>{"abc","xyz","123"}));
+
         Box box;
         pp.query("b", box);
         AMREX_ALWAYS_ASSERT(box == Box(IntVect(AMREX_D_DECL(1,2,3)),
@@ -148,6 +154,48 @@ int main(int argc, char* argv[])
         std::optional<int> o_do_that;
         pp.queryAsDouble("do_that", o_do_that);
         AMREX_ALWAYS_ASSERT(!o_do_that.has_value());
+    }
+    { // boolean strings queried as int
+        ParmParse pp("bool");
+        int v = -1;
+        pp.get("true_val", v);
+        AMREX_ALWAYS_ASSERT(v == 1);
+        pp.get("false_val", v);
+        AMREX_ALWAYS_ASSERT(v == 0);
+        pp.get("True_val", v);
+        AMREX_ALWAYS_ASSERT(v == 1);
+        pp.get("FALSE_val", v);
+        AMREX_ALWAYS_ASSERT(v == 0);
+        pp.get("t_val", v);
+        AMREX_ALWAYS_ASSERT(v == 1);
+        pp.get("f_val", v);
+        AMREX_ALWAYS_ASSERT(v == 0);
+        long lv = -1;
+        pp.get("true_val", lv);
+        AMREX_ALWAYS_ASSERT(lv == 1);
+        pp.get("false_val", lv);
+        AMREX_ALWAYS_ASSERT(lv == 0);
+        long long llv = -1;
+        pp.get("true_val", llv);
+        AMREX_ALWAYS_ASSERT(llv == 1);
+        pp.get("false_val", llv);
+        AMREX_ALWAYS_ASSERT(llv == 0);
+    }
+    { // boolean strings queried as bool
+        ParmParse pp("bool");
+        bool v = false;
+        pp.get("true_val", v);
+        AMREX_ALWAYS_ASSERT(v == true);
+        pp.get("false_val", v);
+        AMREX_ALWAYS_ASSERT(v == false);
+        pp.get("True_val", v);
+        AMREX_ALWAYS_ASSERT(v == true);
+        pp.get("FALSE_val", v);
+        AMREX_ALWAYS_ASSERT(v == false);
+        pp.get("t_val", v);
+        AMREX_ALWAYS_ASSERT(v == true);
+        pp.get("f_val", v);
+        AMREX_ALWAYS_ASSERT(v == false);
     }
     {
         ParmParse pp;

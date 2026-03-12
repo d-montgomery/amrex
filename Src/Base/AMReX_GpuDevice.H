@@ -194,6 +194,8 @@ public:
 
 #ifdef AMREX_USE_GPU
 
+    static int managedMemorySupported () noexcept { return device_prop.managedMemory; }
+
     static int memoryPoolsSupported () noexcept { return memory_pools_supported; }
 
 #if defined(AMREX_USE_HIP)
@@ -452,6 +454,9 @@ void memcpy_from_device_global_to_host_async (void* dst, T const& dg,
 }
 
 #ifdef AMREX_USE_GPU
+
+//! Check if the given stream is active.
+bool isStreamActive (gpuStream_t s);
 
 /**
  * This struct provides a RAII-style mechanism for disabling GPU
